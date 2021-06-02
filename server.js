@@ -1,5 +1,5 @@
 var express = require('express');
-
+var cors = require('cors')
 const sqlite3 = require('sqlite3');
 const db = new sqlite3.Database('./customtravel.db');
 db.serialize(() => {
@@ -10,6 +10,7 @@ db.serialize(() => {
 });
 
 var app = express();
+app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded());
 app.use((req, res, next) => {
@@ -63,7 +64,7 @@ app.post('/api/addemp', function (req, res) {
 })
 
 app.post('/api/listemp', function (req, res) {
-   db.all(`SELECT * FROM Employee`,(error, rows) => {
+   db.all(`SELECT e.EmployeeId, e.Name, d.DeptName, e.DepartmentId FROM Employee e LEFT JOIN Department d ON e.DepartmentId = d.DepartmentId`,(error, rows) => {
       let response = {};
       if(error) {
          console.log(error)
@@ -72,7 +73,7 @@ app.post('/api/listemp', function (req, res) {
       } else {
          response.status = true
          response.message = 'Employee list fetched.'
-         response.date = rows
+         response.data = rows
       }
       res.send(response);
    });
@@ -88,7 +89,7 @@ app.post('/api/listdept', function (req, res) {
       } else {
          response.status = true
          response.message = 'Department list fetched.'
-         response.date = rows
+         response.data = rows
       }
       res.send(response);
    });

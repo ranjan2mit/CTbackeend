@@ -64,7 +64,11 @@ app.post('/api/addemp', function (req, res) {
 })
 
 app.post('/api/listemp', function (req, res) {
-   db.all(`SELECT e.EmployeeId, e.Name, d.DeptName, e.DepartmentId FROM Employee e LEFT JOIN Department d ON e.DepartmentId = d.DepartmentId`,(error, rows) => {
+   let query = `SELECT e.EmployeeId, e.Name, d.DeptName, e.DepartmentId FROM Employee e LEFT JOIN Department d ON e.DepartmentId = d.DepartmentId`;
+   if(req.body.epmloyeename) {
+      query += ` WHERE e.Name like '%${req.body.epmloyeename}%'`
+   }
+   db.all(query, (error, rows) => {
       let response = {};
       if(error) {
          console.log(error)
@@ -80,7 +84,13 @@ app.post('/api/listemp', function (req, res) {
 })
 
 app.post('/api/listdept', function (req, res) {
-   db.all(`SELECT * FROM Department`,(error, rows) => {
+  let query = ''
+   if(req.body.departmentname) {
+      query = `SELECT * FROM Department WHERE DeptName like '%${req.body.departmentname}%'`
+   } else {
+      query = `SELECT * FROM Department`
+   }
+   db.all(query,(error, rows) => {
       let response = {};
       if(error) {
          console.log(error)
